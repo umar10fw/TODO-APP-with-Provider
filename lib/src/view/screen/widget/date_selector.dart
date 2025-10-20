@@ -5,8 +5,25 @@ import 'package:provider/provider.dart';
 import '../../../core/constant/color.dart';
 import 'date_selector/date_selector_viewmodel.dart';
 
-class DateSelector extends StatelessWidget {
+class DateSelector extends StatefulWidget {
   const DateSelector({super.key});
+
+  @override
+  State<DateSelector> createState() => _DateSelectorState();
+}
+
+class _DateSelectorState extends State<DateSelector> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final vm = Provider.of<DateSelectorViewModel>(context, listen: false);
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // ✅ Move initialization check here safely
+    if (vm.selectedDate == null) {
+      vm.initializeSelectedDate(screenWidth);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,22 +40,6 @@ class DateSelector extends StatelessWidget {
         } else {
           containerHeight = 100;
         }
-
-        // ensure current date is selected & centered ONCE after build
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final today = DateTime.now();
-          final todayIndex = vm.daysInMonth.indexWhere(
-                (date) =>
-            date.day == today.day &&
-                date.month == today.month &&
-                date.year == today.year,
-          );
-
-          // if today exists in list and not selected yet, use the VM method that selects+scrolls
-          if (todayIndex != -1 && !vm.isSelected(today)) {
-            vm.selectDate(today, screenWidth); // <-- call VM method that does scroll
-          }
-        });
 
         return Column(
           children: [
@@ -67,23 +68,38 @@ class DateSelector extends StatelessWidget {
                       final dayNumber = DateFormat('d').format(date);
 
                       return GestureDetector(
-                        onTap: () {
-                          vm.selectDate(date, screenWidth); // <-- select + scroll
-                        },
+                        onTap: () => vm.selectDate(date, screenWidth),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 250),
                           margin: EdgeInsets.symmetric(
-                              horizontal: 6.w, vertical: 4.h),
+                              horizontal: 6.w, vertical: 3.h),
                           padding: EdgeInsets.symmetric(
-                              vertical: 10.h, horizontal: 18.w),
+                              vertical: 8.h, horizontal: 16.w),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? AppColors.primary
-                                : theme.cardTheme.color?.withOpacity(0.8),
+                                : theme.cardTheme.color?.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(14.r),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.transparent
+                                  : AppColors.primary.withOpacity(0.2),
+                              width: 1.4,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                              BoxShadow(
+                                color:
+                                AppColors.primary.withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 1),
+                              ),
+                            ]
+                                : [],
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 dayNumber,
@@ -101,6 +117,7 @@ class DateSelector extends StatelessWidget {
                                       : FontWeight.w500,
                                 ),
                               ),
+                              SizedBox(height: 2.h),
                               Text(
                                 dayName,
                                 style: theme.textTheme.bodyMedium!.copyWith(

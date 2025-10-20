@@ -11,6 +11,23 @@ class DateSelectorViewModel extends ChangeNotifier {
     _initializeCurrentMonth();
   }
 
+  void initializeSelectedDate(double screenWidth) {
+    if (selectedDate == null) {
+      final today = DateTime.now();
+      final todayIndex = daysInMonth.indexWhere(
+            (date) =>
+        date.day == today.day &&
+            date.month == today.month &&
+            date.year == today.year,
+      );
+      if (todayIndex != -1) {
+        selectDate(today, screenWidth);
+      }
+    }
+  }
+
+
+
   /// Always start with today's date when app launches
   void _initializeCurrentMonth() {
     final now = DateTime.now();

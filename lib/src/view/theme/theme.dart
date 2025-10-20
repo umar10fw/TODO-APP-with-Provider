@@ -71,13 +71,6 @@ class AppTheme {
         ),
       ),
     ),
-    cardTheme: CardTheme(
-      color: AppColors.surfaceLight,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      elevation: 3,
-    ),
   );
 
   // 🌙 DARK THEME
@@ -142,13 +135,6 @@ class AppTheme {
           fontSize: 16,
         ),
       ),
-    ),
-    cardTheme: CardTheme(
-      color: AppColors.surfaceDark,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      elevation: 2,
     ),
   );
 }
